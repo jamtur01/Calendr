@@ -26,7 +26,6 @@ class MainViewController: NSViewController {
     private let mainStackView = NSStackView()
     private let nextEventView: NextEventView
     private let nextReminderView: NextEventView
-    private let calendarView: CalendarView
     private let eventListView: EventListView
     private let titleLabel = Label()
     private let searchInput = NSSearchField()
@@ -40,7 +39,6 @@ class MainViewController: NSViewController {
     private let settingsBtn = ImageButton()
 
     // ViewModels
-    private let calendarViewModel: CalendarViewModel
     private let settingsViewModel: SettingsViewModel
     private let statusItemViewModel: StatusItemViewModel
     private let nextEventViewModel: NextEventViewModel
@@ -51,7 +49,6 @@ class MainViewController: NSViewController {
     // Reactive
     private let disposeBag = DisposeBag()
     private var popoverDisposeBag = DisposeBag()
-    private let dateClick = PublishSubject<Date>()
     private let dateDoubleClick = PublishSubject<Date>()
     private let refreshDate = PublishSubject<Void>()
     private let selectedDate: BehaviorSubject<Date>
@@ -60,7 +57,8 @@ class MainViewController: NSViewController {
     private let searchInputText = BehaviorSubject<String>(value: "")
     private let searchInputSuggestionDate = BehaviorSubject<DateSuggestionResult?>(value: nil)
     private let navigationSubject = PublishSubject<Keyboard.Key>()
-    private let keyboardModifiers = BehaviorSubject<NSEvent.ModifierFlags>(value: [])
+    // No longer needed since calendar view is removed
+    // private let keyboardModifiers = BehaviorSubject<NSEvent.ModifierFlags>(value: [])
     private let deeplink: Observable<URL>
 
     // Properties
@@ -150,31 +148,27 @@ class MainViewController: NSViewController {
             fileManager: fileManager
         )
 
-        let (hoverObservable, hoverObserver) = PublishSubject<Date?>.pipe()
-
-        calendarViewModel = CalendarViewModel(
-            searchObservable: searchInputText,
-            dateObservable: selectedDate,
-            hoverObservable: hoverObservable,
-            keyboardModifiers: keyboardModifiers,
-            enabledCalendars: calendarPickerViewModel.enabledCalendars,
-            calendarService: calendarService,
-            dateProvider: dateProvider,
-            settings: settingsViewModel
-        )
-
-        calendarView = CalendarView(
-            viewModel: calendarViewModel,
-            hoverObserver: hoverObserver,
-            clickObserver: dateClick.asObserver(),
-            doubleClickObserver: dateDoubleClick.asObserver()
-        )
-
-        let eventListEventsObservable = calendarViewModel.focusedDateEventsObservable
+        // Create direct observable for events based on selected date
+        let eventListEventsObservable = selectedDate
+            .flatMapLatest { [calendarService, calendarPickerViewModel, dateProvider] date -> Observable<(Date, [EventModel])> in
+                let startDate = dateProvider.calendar.startOfDay(for: date)
+                let endDate = dateProvider.calendar.endOfDay(for: date)
+                
+                return calendarPickerViewModel.enabledCalendars
+                    .flatMapLatest { calendars -> Observable<(Date, [EventModel])> in
+                        return calendarService.events(
+                            from: startDate,
+                            to: endDate,
+                            calendars: calendars
+                        )
+                        .asObservable()
+                        .map { events in (date, events) }
+                    }
+            }
             .debounce(.milliseconds(50), scheduler: MainScheduler.instance)
             .share(replay: 1)
-
-        focusedDateObservable = eventListEventsObservable.map(\.0)
+            
+        focusedDateObservable = eventListEventsObservable.map { tuple in tuple.0 }
 
         eventListViewModel = EventListViewModel(
             eventsObservable: eventListEventsObservable,
@@ -268,7 +262,7 @@ class MainViewController: NSViewController {
         let eventListSummary = makeEventListSummary()
         let eventListScroll = makeEventListScroll()
 
-        [header, searchInput, calendarView, toolBar, eventListSummary, eventListScroll].forEach(mainStackView.addArrangedSubview)
+        [header, searchInput, toolBar, eventListSummary, eventListScroll].forEach(mainStackView.addArrangedSubview)
 
         // avoid collapsing because of content constraints
         eventListSummary.width(equalTo: mainStackView)
@@ -295,7 +289,8 @@ class MainViewController: NSViewController {
         searchInputSuggestionView.leading(equalTo: searchInput, constant: 20)
         searchInputSuggestionView.isHidden = true
 
-        mainStackView.width(equalTo: calendarView)
+        // Set a fixed width for the main stack view since calendarView is removed
+        mainStackView.width(equalTo: 300)
         mainStackView.top(equalTo: view, constant: Constants.MainStackView.margin)
         mainStackView.leading(equalTo: view, constant: Constants.MainStackView.margin)
         mainStackView.trailing(equalTo: view, constant: -Constants.MainStackView.margin)
@@ -378,11 +373,15 @@ class MainViewController: NSViewController {
         .bind(to: refreshDate)
         .disposed(by: disposeBag)
 
-        dateClick
-            .bind(to: selectedDate)
-            .disposed(by: disposeBag)
+        // dateClick binding removed - calendar view has been removed
 
-        calendarViewModel.title
+        // Set title to formatted date - show day since we're navigating by day
+        selectedDate
+            .map { [dateProvider] date -> String in
+                let formatter = DateFormatter(calendar: dateProvider.calendar)
+                formatter.dateFormat = "MMMM d, yyyy"
+                return formatter.string(from: date)
+            }
             .bind(to: titleLabel.rx.text)
             .disposed(by: disposeBag)
 
@@ -699,7 +698,7 @@ class MainViewController: NSViewController {
         keyboard.listen(in: self) { [weak self] event, key -> NSEvent? in
             guard let self else { return event }
 
-            keyboardModifiers.onNext(event.modifierFlags)
+            // keyboardModifiers removed since calendar view is removed
 
             guard let key else {
                 return event
@@ -957,14 +956,14 @@ class MainViewController: NSViewController {
         titleLabel.textColor = .headerTextColor
 
         [prevBtn, resetBtn, nextBtn].forEach { $0.size(equalTo: 22) }
+prevBtn.image = Icons.Calendar.prev
+prevBtn.toolTip = "Previous Day" // Changed from prevMonth
 
-        prevBtn.image = Icons.Calendar.prev
-        prevBtn.toolTip = Strings.Tooltips.Navigation.prevMonth
+resetBtn.image = Icons.Calendar.reset.with(scale: .small)
+resetBtn.toolTip = Strings.Tooltips.Navigation.today
 
-        resetBtn.image = Icons.Calendar.reset.with(scale: .small)
-        resetBtn.toolTip = Strings.Tooltips.Navigation.today
-
-        nextBtn.image = Icons.Calendar.next
+nextBtn.image = Icons.Calendar.next
+nextBtn.toolTip = "Next Day" // Changed from nextMonth
         nextBtn.toolTip = Strings.Tooltips.Navigation.nextMonth
 
         return NSStackView(views: [
@@ -1011,12 +1010,12 @@ class MainViewController: NSViewController {
             initial: refreshDate.map { [dateProvider] in dateProvider.now },
             selected: selectedDate,
             reset: .merge(resetBtn.rx.tap.asObservable(), backspace),
-            prevDay: keyLeft,
-            nextDay: keyRight,
+            prevDay: .merge(keyLeft, prevBtn.rx.tap.asObservable()),
+            nextDay: .merge(keyRight, nextBtn.rx.tap.asObservable()),
             prevWeek: keyUp,
             nextWeek: keyDown,
-            prevMonth: .merge(prevBtn.rx.tap.asObservable(), cmdUpLeft),
-            nextMonth: .merge(nextBtn.rx.tap.asObservable(), cmdDownRight)
+            prevMonth: cmdUpLeft,
+            nextMonth: cmdDownRight
         )
 
         return dateSelector
@@ -1030,7 +1029,7 @@ private func makeContextMenu(_ viewModel: some ContextMenuViewModel) -> NSMenu {
 private enum Constants {
 
     enum MainStackView {
-        static let margin: CGFloat = 8
+        static let margin: CGFloat = 38
     }
 }
 

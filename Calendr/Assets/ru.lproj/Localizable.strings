@@ -57,6 +57,9 @@
 "settings.events.show_finished_events" = "Показывать завершенные события";
 "settings.events.show_recurrence_indicator" = "Показывать индикатор повторения";
 "settings.events.force_local_time_zone" = "Показывать все события в местном часовом поясе";
+//"settings.events.hide_clone_events" = "Hide events with '(Clone)' in title";
+//"settings.events.hide_busy_events" = "Hide events with 'Busy' title";
+//"settings.events.hide_block_events" = "Hide events with 'Block' in title";
 
 "settings.appearance.transparency" = "Прозрачность";
 "settings.appearance.accessibility" = "Доступность";

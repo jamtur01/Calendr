@@ -773,4 +773,60 @@ class NextEventViewModelTests: XCTestCase {
 
         XCTAssertEqual(hasEvent, false)
     }
+    
+    func testNextEvent_fallbackToNextDay() {
+        var title: String?
+        var hasEvent: Bool?
+        
+        viewModel.title
+            .bind { title = $0 }
+            .disposed(by: disposeBag)
+            
+        viewModel.hasEvent
+            .bind { hasEvent = $0 }
+            .disposed(by: disposeBag)
+        
+        // Set the current time to 6pm
+        let sixPM = DateComponents(year: 2021, month: 1, day: 1, hour: 18, minute: 0)
+        dateProvider.now = dateProvider.calendar.date(from: sixPM)!
+        
+        // Set check range to 6 hours
+        settings.eventStatusItemCheckRangeObserver.onNext(6)
+        
+        // No events for the rest of today (within 6 hours)
+        // Add an event for tomorrow morning
+        let nextDay = dateProvider.calendar.date(byAdding: .day, value: 1, to: dateProvider.now)!
+        let tomorrowMorning = dateProvider.calendar.date(bySettingHour: 9, minute: 0, second: 0, of: nextDay)!
+        
+        calendarService.changeEvents([
+            .make(start: tomorrowMorning, end: tomorrowMorning + 3600, title: "Tomorrow's Meeting")
+        ])
+        
+        // Verify that the next event is the one from tomorrow
+        XCTAssertEqual(title, "Tomorrow's Meeting")
+        XCTAssertEqual(hasEvent, true)
+        
+        // Add an event for late tonight, but outside the check range (6 hours)
+        let midnight = dateProvider.calendar.date(bySettingHour: 23, minute: 59, second: 0, of: dateProvider.now)!
+        
+        calendarService.changeEvents([
+            .make(start: midnight, end: midnight + 3600, title: "Late Night Event"),
+            .make(start: tomorrowMorning, end: tomorrowMorning + 3600, title: "Tomorrow's Meeting")
+        ])
+        
+        // Still shows tomorrow's event since the late night one is outside check range
+        XCTAssertEqual(title, "Tomorrow's Meeting")
+        
+        // Now add an event within the check range
+        let withinRange = dateProvider.now.addingTimeInterval(3600 * 4) // 4 hours from now
+        
+        calendarService.changeEvents([
+            .make(start: withinRange, end: withinRange + 3600, title: "Tonight's Event"),
+            .make(start: midnight, end: midnight + 3600, title: "Late Night Event"),
+            .make(start: tomorrowMorning, end: tomorrowMorning + 3600, title: "Tomorrow's Meeting")
+        ])
+        
+        // Now it should show tonight's event since it's within range
+        XCTAssertEqual(title, "Tonight's Event")
+    }
 }

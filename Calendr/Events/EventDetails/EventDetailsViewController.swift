@@ -89,7 +89,7 @@ class EventDetailsViewController: NSViewController, PopoverDelegate, MKMapViewDe
         detailsStackView.setHuggingPriority(.required, for: .horizontal)
 
         contentStackView.addArrangedSubview(scrollView)
-        contentStackView.spacing = 8
+        contentStackView.spacing = 38
         contentStackView.setHuggingPriority(.required, for: .vertical)
 
         detailsStackView.setHuggingPriority(.required, for: .vertical)
@@ -371,6 +371,31 @@ class EventDetailsViewController: NSViewController, PopoverDelegate, MKMapViewDe
         if !viewModel.location.isEmpty {
             locationLabel.stringValue = viewModel.location
             detailsStackView.addArrangedSubview(makeLine())
+            
+            // Make location clickable for Teams meetings
+            if viewModel.location.contains("Microsoft Teams Meeting") && viewModel.link != nil {
+                // Style the label to look like a link
+                locationLabel.textColor = .linkColor
+                
+                // Create a cursor button that will overlay the label
+                let clickableButton = CursorButton(cursor: NSCursor.pointingHand)
+                clickableButton.bezelStyle = .regularSquare
+                clickableButton.isBordered = false
+                clickableButton.title = ""
+                clickableButton.target = self
+                clickableButton.action = #selector(handleLocationClick)
+                clickableButton.translatesAutoresizingMaskIntoConstraints = false
+                
+                locationLabel.addSubview(clickableButton)
+                
+                // Make the button resize with the label
+                NSLayoutConstraint.activate([
+                    clickableButton.topAnchor.constraint(equalTo: locationLabel.topAnchor),
+                    clickableButton.bottomAnchor.constraint(equalTo: locationLabel.bottomAnchor),
+                    clickableButton.leadingAnchor.constraint(equalTo: locationLabel.leadingAnchor),
+                    clickableButton.trailingAnchor.constraint(equalTo: locationLabel.trailingAnchor)
+                ])
+            }
 
             if viewModel.canShowMap.current {
                 let weatherContainer = NSView().with(size: CGSize(width: 30, height: 26))
@@ -656,6 +681,10 @@ class EventDetailsViewController: NSViewController, PopoverDelegate, MKMapViewDe
         viewModel.isShowingObserver.onNext(false)
     }
 
+    @objc private func handleLocationClick() {
+        viewModel.linkTapped.onNext(())
+    }
+    
     private func makeLine() -> NSView {
 
         let line = NSView.spacer(height: 1)

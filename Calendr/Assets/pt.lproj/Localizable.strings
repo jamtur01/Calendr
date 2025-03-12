@@ -56,6 +56,9 @@
 "settings.events.show_finished_events" = "Mostrar eventos terminados";
 "settings.events.show_recurrence_indicator" = "Mostrar indicador de recorrência";
 "settings.events.force_local_time_zone" = "Mostrar todos os eventos no horário local";
+//"settings.events.hide_clone_events" = "Hide events with '(Clone)' in title";
+//"settings.events.hide_busy_events" = "Hide events with 'Busy' title";
+//"settings.events.hide_block_events" = "Hide events with 'Block' in title";
 
 "settings.appearance.transparency" = "Transparência";
 "settings.appearance.accessibility" = "Acessibilidade";

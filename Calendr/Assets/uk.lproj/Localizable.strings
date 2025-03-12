@@ -56,6 +56,9 @@
 "settings.events.show_finished_events" = "Показувати завершені події";
 "settings.events.show_recurrence_indicator" = "Показувати індикатор повторення";
 "settings.events.force_local_time_zone" = "Показувати всі події в місцевому часовому поясі";
+//"settings.events.hide_clone_events" = "Hide events with '(Clone)' in title";
+//"settings.events.hide_busy_events" = "Hide events with 'Busy' title";
+//"settings.events.hide_block_events" = "Hide events with 'Block' in title";
 
 "settings.appearance.transparency" = "Прозорість";
 "settings.appearance.accessibility" = "Доступність";

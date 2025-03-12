@@ -56,6 +56,9 @@
 "settings.events.show_finished_events" = "Show finished events";
 "settings.events.show_recurrence_indicator" = "Show recurrence indicator";
 "settings.events.force_local_time_zone" = "Show all events in local time zone";
+"settings.events.hide_clone_events" = "Hide events with '(Clone)' in title";
+"settings.events.hide_busy_events" = "Hide events with 'Busy' title";
+"settings.events.hide_block_events" = "Hide events with 'Block' in title";
 
 "settings.appearance.transparency" = "Transparency";
 "settings.appearance.accessibility" = "Accessibility";

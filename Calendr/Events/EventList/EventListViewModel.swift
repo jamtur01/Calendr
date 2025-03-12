@@ -54,6 +54,9 @@ class EventListViewModel {
         let date: Date
         let showPastEvents: Bool
         let showOverdue: Bool
+        let hideCloneEvents: Bool
+        let hideBusyEvents: Bool
+        let hideBlockEvents: Bool
         let isTodaySelected: Bool
     }
 
@@ -153,9 +156,12 @@ class EventListViewModel {
             eventsObservable,
             settings.showPastEvents,
             settings.showOverdueReminders,
+            settings.hideCloneEvents,
+            settings.hideBusyEvents,
+            settings.hideBlockEvents,
             isShowingDetails
         )
-        .compactMap { dateEvents, showPast, showOverdue, isShowingDetails -> EventListProps? in
+        .compactMap { dateEvents, showPast, showOverdue, hideCloneEvents, hideBusyEvents, hideBlockEvents, isShowingDetails -> EventListProps? in
             guard !isShowingDetails else { return nil }
             let (date, events) = dateEvents
             let isTodaySelected = dateProvider.calendar.isDate(date, inSameDayAs: dateProvider.now)
@@ -165,6 +171,9 @@ class EventListViewModel {
                 date: date,
                 showPastEvents: showPast,
                 showOverdue: showOverdue,
+                hideCloneEvents: hideCloneEvents,
+                hideBusyEvents: hideBusyEvents,
+                hideBlockEvents: hideBlockEvents,
                 isTodaySelected: isTodaySelected
             )
         }
@@ -197,6 +206,7 @@ class EventListViewModel {
                     if case .reminder(let completed) = $0.type {
                         return !completed
                     }
+                    
                     return $0.isAllDay || !$0.range(using: dateProvider).isPast
                 }
                 return props
@@ -205,10 +215,34 @@ class EventListViewModel {
         // build event list
         .compactMap { [weak self] props -> EventListGroups? in
             guard let self else { return nil }
-
-            let overdue = overdueViewModels(props)
-            let allday = allDayViewModels(props)
-            let today = todayViewModels(props)
+            
+            // Apply event filtering for Clone, Busy, and Block events globally
+           let filteredEvents = props.events.filter { event in
+               // Filter out events with "(Clone)" in the title
+               if props.hideCloneEvents && event.title.contains("(Clone)") {
+                   return false
+               }
+               
+               // Filter out events with the title "Busy"
+               if props.hideBusyEvents && event.title == "Busy" {
+                   return false
+               }
+               
+               // Filter out events with titles that start with "Block"
+               if props.hideBlockEvents && event.title.starts(with: "Block") {
+                   return false
+               }
+               
+               return true
+           }
+            
+            // Create props with filtered events
+            var filteredProps = props
+            filteredProps.events = filteredEvents
+            
+            let overdue = overdueViewModels(filteredProps)
+            let allday = allDayViewModels(filteredProps)
+            let today = todayViewModels(filteredProps)
 
             return EventListGroups(overdue: overdue, allday: allday, today: today)
         }

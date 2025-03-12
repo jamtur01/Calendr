@@ -56,6 +56,9 @@
 "settings.events.show_finished_events" = "展示已完成日程";
 "settings.events.show_recurrence_indicator" = "展示日程重复标识";
 //"settings.events.force_local_time_zone" = "Show all events in local time zone";
+//"settings.events.hide_clone_events" = "Hide events with '(Clone)' in title";
+//"settings.events.hide_busy_events" = "Hide events with 'Busy' title";
+//"settings.events.hide_block_events" = "Hide events with 'Block' in title";
 
 "settings.appearance.transparency" = "透明度";
 "settings.appearance.accessibility" = "无障碍";

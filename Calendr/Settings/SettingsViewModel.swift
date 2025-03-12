@@ -76,6 +76,9 @@ protocol EventSettings: AppearanceSettings {
     var showRecurrenceIndicator: Observable<Bool> { get }
     var forceLocalTimeZone: Observable<Bool> { get }
     var showMap: Observable<Bool> { get }
+    var hideCloneEvents: Observable<Bool> { get }
+    var hideBusyEvents: Observable<Bool> { get }
+    var hideBlockEvents: Observable<Bool> { get }
 }
 
 protocol EventListSettings: EventSettings {
@@ -142,6 +145,9 @@ class SettingsViewModel:
     let toggleOverdueReminders: AnyObserver<Bool>
     let toggleRecurrenceIndicator: AnyObserver<Bool>
     let toggleForceLocalTimeZone: AnyObserver<Bool>
+    let toggleHideCloneEvents: AnyObserver<Bool>
+    let toggleHideBusyEvents: AnyObserver<Bool>
+    let toggleHideBlockEvents: AnyObserver<Bool>
     let transparencyObserver: AnyObserver<Int>
     let textScalingObserver: AnyObserver<Double>
     let calendarTextScalingObserver: AnyObserver<Double>
@@ -180,6 +186,9 @@ class SettingsViewModel:
     let showOverdueReminders: Observable<Bool>
     let showRecurrenceIndicator: Observable<Bool>
     let forceLocalTimeZone: Observable<Bool>
+    let hideCloneEvents: Observable<Bool>
+    let hideBusyEvents: Observable<Bool>
+    let hideBlockEvents: Observable<Bool>
     let popoverTransparency: Observable<Int>
     let popoverMaterial: Observable<PopoverMaterial>
     let textScaling: Observable<Double>
@@ -265,6 +274,9 @@ class SettingsViewModel:
         toggleOverdueReminders = userDefaults.rx.observer(for: \.showOverdueReminders)
         toggleRecurrenceIndicator = userDefaults.rx.observer(for: \.showRecurrenceIndicator)
         toggleForceLocalTimeZone = userDefaults.rx.observer(for: \.forceLocalTimeZone)
+        toggleHideCloneEvents = userDefaults.rx.observer(for: \.hideCloneEvents)
+        toggleHideBusyEvents = userDefaults.rx.observer(for: \.hideBusyEvents)
+        toggleHideBlockEvents = userDefaults.rx.observer(for: \.hideBlockEvents)
         transparencyObserver = userDefaults.rx.observer(for: \.transparencyLevel)
         textScalingObserver = userDefaults.rx.observer(for: \.textScaling)
         calendarTextScalingObserver = userDefaults.rx.observer(for: \.calendarTextScaling)
@@ -311,6 +323,9 @@ class SettingsViewModel:
         showOverdueReminders = userDefaults.rx.observe(\.showOverdueReminders)
         showRecurrenceIndicator = userDefaults.rx.observe(\.showRecurrenceIndicator)
         forceLocalTimeZone = userDefaults.rx.observe(\.forceLocalTimeZone)
+        hideCloneEvents = userDefaults.rx.observe(\.hideCloneEvents)
+        hideBusyEvents = userDefaults.rx.observe(\.hideBusyEvents)
+        hideBlockEvents = userDefaults.rx.observe(\.hideBlockEvents)
         popoverTransparency = userDefaults.rx.observe(\.transparencyLevel)
         textScaling = userDefaults.rx.observe(\.textScaling)
         calendarTextScaling = userDefaults.rx.observe(\.calendarTextScaling)

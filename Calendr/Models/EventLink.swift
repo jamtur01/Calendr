@@ -42,14 +42,44 @@ extension EventModel {
 }
 
 private func detectLinks(_ texts: [String?]) -> [URL] {
-
+    
     let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
-
+    
     return texts.compact().flatMap { text in
-        detector
+        let urls = detector
             .matches(in: text, options: [], range: NSRange(location: 0, length: text.count))
             .filter { text[Range($0.range, in: text)!].contains("://") }
             .compactMap(\.url)
+        
+        // Handle Teams meetings with special priority
+        if text.contains("teams.microsoft.com/l/meetup-join") || text.contains("Join the meeting now") {
+            // Look for a SafeLinks URL with a Teams meeting inside
+            let safelinksTeamsURLs = urls.filter { url in
+                let urlString = url.absoluteString
+                return urlString.contains("safelinks") &&
+                       urlString.contains("teams.microsoft.com") &&
+                       urlString.contains("meetup-join")
+            }
+            
+            // If we found SafeLinks URL containing Teams meeting link, prioritize it
+            if !safelinksTeamsURLs.isEmpty {
+                return safelinksTeamsURLs
+            }
+            
+            // If this is a Teams meeting but doesn't have SafeLinks wrapping
+            // and we have multiple URLs, pick the one with "meetup-join"
+            if urls.count > 1 {
+                let teamsJoinURLs = urls.filter { $0.absoluteString.contains("teams.microsoft.com/l/meetup-join") }
+                if !teamsJoinURLs.isEmpty {
+                    return teamsJoinURLs
+                }
+                
+                // If we still couldn't find the right URL, return the second one (common Teams pattern)
+                return Array(urls.dropFirst(1))
+            }
+        }
+        
+        return urls
     }
 }
 

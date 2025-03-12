@@ -56,6 +56,9 @@
 "settings.events.show_finished_events" = "Zobraziť ukončené udalosti";
 "settings.events.show_recurrence_indicator" = "Zobraziť indikátor opakovania";
 "settings.events.force_local_time_zone" = "Zobraziť všetky udalosti v miestnom čase";
+//"settings.events.hide_clone_events" = "Hide events with '(Clone)' in title";
+//"settings.events.hide_busy_events" = "Hide events with 'Busy' title";
+//"settings.events.hide_block_events" = "Hide events with 'Block' in title";
 
 "settings.appearance.transparency" = "Priehľadnosť";
 "settings.appearance.accessibility" = "Prístupnosť";
