@@ -56,6 +56,9 @@
 "settings.events.show_finished_events" = "Shfaq ngjarjet e përfunduara";
 "settings.events.show_recurrence_indicator" = "Trego treguesin e përsëritjes";
 "settings.events.force_local_time_zone" = "Shfaq të gjitha ngjarjet në zonën kohore lokale";
+//"settings.events.hide_clone_events" = "Hide events with '(Clone)' in title";
+//"settings.events.hide_busy_events" = "Hide events with 'Busy' title";
+//"settings.events.hide_block_events" = "Hide events with 'Block' in title";
 
 "settings.appearance.transparency" = "Transparenca";
 "settings.appearance.accessibility" = "Aksesueshmëria";

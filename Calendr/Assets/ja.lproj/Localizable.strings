@@ -56,6 +56,9 @@
 "settings.events.show_finished_events" = "終了した予定を表示";
 "settings.events.show_recurrence_indicator" = "繰り返しの予定にマークを表示";
 "settings.events.force_local_time_zone" = "すべての予定を端末のタイムゾーンで表示";
+//"settings.events.hide_clone_events" = "Hide events with '(Clone)' in title";
+//"settings.events.hide_busy_events" = "Hide events with 'Busy' title";
+//"settings.events.hide_block_events" = "Hide events with 'Block' in title";
 
 "settings.appearance.transparency" = "透明度";
 "settings.appearance.accessibility" = "アクセシビリティ";

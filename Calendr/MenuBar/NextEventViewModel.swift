@@ -117,15 +117,23 @@ class NextEventViewModel {
 
         let filteredEvents = Observable
             .combineLatest(
-                nextEvents, skippedEvents
+                nextEvents,
+                skippedEvents,
+                settings.hideCloneEvents,
+                settings.hideBusyEvents,
+                settings.hideBlockEvents
             )
-            .map { events, skipped in
+            .map { events, skipped, hideClone, hideBusy, hideBlock in
                 events.filter { event in
                     type.matches(event.type) &&
                     event.type != .reminder(completed: true) &&
                     !event.isAllDay &&
                     event.status != .declined &&
-                    !skipped.contains(Skipped(event))
+                    !skipped.contains(Skipped(event)) &&
+                    // Filter Clone/Busy/Block events
+                    !(hideClone && event.title.contains("(Clone)")) &&
+                    !(hideBusy && event.title == "Busy") &&
+                    !(hideBlock && event.title.starts(with: "Block"))
                 }
             }
 
@@ -155,13 +163,35 @@ class NextEventViewModel {
                     .void()
                     .startWith(())
                     .map {
-                        events
+                        // First try to find an event in the next hoursToCheck hours
+                        let currentDayEvent = events
                             .first(where: { event in
                                 dateProvider.calendar.isDate(
                                     dateProvider.now, lessThan: event.end, granularity: .second
                                 )
                                 &&
                                 Int(dateProvider.now.distance(to: event.start)) <= 3600 * hoursToCheck
+                            })
+                        
+                        if let event = currentDayEvent {
+                            // Found an event within the next hoursToCheck hours
+                            let isInProgress = dateProvider.calendar.isDate(
+                                dateProvider.now, greaterThanOrEqualTo: event.start, granularity: .second
+                            )
+                            return NextEvent(event: event, isInProgress: isInProgress)
+                        }
+                        
+                        // If no event is found within hoursToCheck, find the first event of the next day
+                        let startOfToday = dateProvider.calendar.startOfDay(for: dateProvider.now)
+                        let startOfTomorrow = dateProvider.calendar.date(byAdding: .day, value: 1, to: startOfToday)!
+                        
+                        return events
+                            .first(where: { event in
+                                dateProvider.calendar.isDate(
+                                    dateProvider.now, lessThan: event.end, granularity: .second
+                                )
+                                &&
+                                dateProvider.calendar.isDate(startOfTomorrow, lessThanOrEqualTo: event.start, granularity: .day)
                             })
                             .map { event -> NextEvent in
                                 let isInProgress = dateProvider.calendar.isDate(

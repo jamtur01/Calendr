@@ -48,6 +48,9 @@ class GeneralSettingsViewController: NSViewController, SettingsUI {
     private let showOverdueCheckbox = Checkbox(title: Strings.Settings.Events.showOverdueReminders)
     private let showRecurrenceCheckbox = Checkbox(title: Strings.Settings.Events.showRecurrenceIndicator)
     private let forceLocalTimeZoneCheckbox = Checkbox(title: Strings.Settings.Events.forceLocalTimeZone)
+    private let hideCloneEventsCheckbox = Checkbox(title: Strings.Settings.Events.hideCloneEvents)
+    private let hideBusyEventsCheckbox = Checkbox(title: Strings.Settings.Events.hideBusyEvents)
+    private let hideBlockEventsCheckbox = Checkbox(title: Strings.Settings.Events.hideBlockEvents)
 
     init(viewModel: SettingsViewModel) {
 
@@ -224,7 +227,10 @@ class GeneralSettingsViewController: NSViewController, SettingsUI {
             showFinishedEventsCheckbox,
             showOverdueCheckbox,
             showRecurrenceCheckbox,
-            forceLocalTimeZoneCheckbox
+            forceLocalTimeZoneCheckbox,
+            hideCloneEventsCheckbox,
+            hideBusyEventsCheckbox,
+            hideBlockEventsCheckbox
         ]).with(orientation: .vertical)
     }()
 
@@ -554,6 +560,27 @@ class GeneralSettingsViewController: NSViewController, SettingsUI {
             control: forceLocalTimeZoneCheckbox,
             observable: viewModel.forceLocalTimeZone,
             observer: viewModel.toggleForceLocalTimeZone
+        )
+        .disposed(by: disposeBag)
+        
+        bind(
+            control: hideCloneEventsCheckbox,
+            observable: viewModel.hideCloneEvents,
+            observer: viewModel.toggleHideCloneEvents
+        )
+        .disposed(by: disposeBag)
+        
+        bind(
+            control: hideBusyEventsCheckbox,
+            observable: viewModel.hideBusyEvents,
+            observer: viewModel.toggleHideBusyEvents
+        )
+        .disposed(by: disposeBag)
+        
+        bind(
+            control: hideBlockEventsCheckbox,
+            observable: viewModel.hideBlockEvents,
+            observer: viewModel.toggleHideBlockEvents
         )
         .disposed(by: disposeBag)
     }

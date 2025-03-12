@@ -163,6 +163,12 @@ internal enum Strings {
     internal enum Events {
       /// Show all events in local time zone
       internal static let forceLocalTimeZone = Strings.tr("Localizable", "settings.events.force_local_time_zone", fallback: "Show all events in local time zone")
+      /// Hide events with 'Block' in title
+      internal static let hideBlockEvents = Strings.tr("Localizable", "settings.events.hide_block_events", fallback: "Hide events with 'Block' in title")
+      /// Hide events with 'Busy' title
+      internal static let hideBusyEvents = Strings.tr("Localizable", "settings.events.hide_busy_events", fallback: "Hide events with 'Busy' title")
+      /// Hide events with '(Clone)' in title
+      internal static let hideCloneEvents = Strings.tr("Localizable", "settings.events.hide_clone_events", fallback: "Hide events with '(Clone)' in title")
       /// Show finished events
       internal static let showFinishedEvents = Strings.tr("Localizable", "settings.events.show_finished_events", fallback: "Show finished events")
       /// Show map and weather

@@ -47,6 +47,9 @@ enum Prefs {
     static let showOverdueReminders = "show_overdue_reminders"
     static let showRecurrenceIndicator = "show_recurrence_indicator"
     static let forceLocalTimeZone = "force_local_time_zone"
+    static let hideCloneEvents = "hide_clone_events"
+    static let hideBusyEvents = "hide_busy_events"
+    static let hideBlockEvents = "hide_block_events"
 
     // Appearance
     static let transparencyLevel = "transparency_level"
@@ -102,6 +105,9 @@ func registerDefaultPrefs(in userDefaults: UserDefaults, calendar: Calendar = .c
         Prefs.showOverdueReminders: true,
         Prefs.showRecurrenceIndicator: true,
         Prefs.forceLocalTimeZone: false,
+        Prefs.hideCloneEvents: true,
+        Prefs.hideBusyEvents: true,
+        Prefs.hideBlockEvents: true,
 
         // Appearance
         Prefs.transparencyLevel: 2,
@@ -272,6 +278,21 @@ extension UserDefaults {
     @objc dynamic var forceLocalTimeZone: Bool {
         get { bool(forKey: Prefs.forceLocalTimeZone) }
         set { set(newValue, forKey: Prefs.forceLocalTimeZone) }
+    }
+    
+    @objc dynamic var hideCloneEvents: Bool {
+        get { bool(forKey: Prefs.hideCloneEvents) }
+        set { set(newValue, forKey: Prefs.hideCloneEvents) }
+    }
+    
+    @objc dynamic var hideBusyEvents: Bool {
+        get { bool(forKey: Prefs.hideBusyEvents) }
+        set { set(newValue, forKey: Prefs.hideBusyEvents) }
+    }
+    
+    @objc dynamic var hideBlockEvents: Bool {
+        get { bool(forKey: Prefs.hideBlockEvents) }
+        set { set(newValue, forKey: Prefs.hideBlockEvents) }
     }
 
     // Appearance
