@@ -258,11 +258,12 @@ class MainViewController: NSViewController {
         view = NSView()
 
         let header = makeHeader()
+        let separator = makeSeparator()
         let toolBar = makeToolBar()
         let eventListSummary = makeEventListSummary()
         let eventListScroll = makeEventListScroll()
 
-        [header, searchInput, toolBar, eventListSummary, eventListScroll].forEach(mainStackView.addArrangedSubview)
+        [header, separator, searchInput, toolBar, eventListSummary, eventListScroll].forEach(mainStackView.addArrangedSubview)
 
         // avoid collapsing because of content constraints
         eventListSummary.width(equalTo: mainStackView)
@@ -379,8 +380,27 @@ class MainViewController: NSViewController {
         selectedDate
             .map { [dateProvider] date -> String in
                 let formatter = DateFormatter(calendar: dateProvider.calendar)
-                formatter.dateFormat = "MMMM d, yyyy"
-                return formatter.string(from: date)
+                formatter.dateFormat = "EEEE, MMMM"
+                
+                // Get the day of month
+                let day = dateProvider.calendar.component(.day, from: date)
+                
+                // Determine the suffix
+                let suffix: String
+                switch day {
+                case 1, 21, 31: suffix = "st"
+                case 2, 22: suffix = "nd"
+                case 3, 23: suffix = "rd"
+                default: suffix = "th"
+                }
+                
+                // Get year
+                let yearFormatter = DateFormatter(calendar: dateProvider.calendar)
+                yearFormatter.dateFormat = "yyyy"
+                let year = yearFormatter.string(from: date)
+                
+                // Combine all parts
+                return "\(formatter.string(from: date)) \(day)\(suffix) \(year)"
             }
             .bind(to: titleLabel.rx.text)
             .disposed(by: disposeBag)
@@ -949,12 +969,20 @@ class MainViewController: NSViewController {
 
         return scrollView
     }
+private func makeSeparator() -> NSView {
+    let separator = NSView()
+    separator.wantsLayer = true
+    separator.layer?.backgroundColor = NSColor.separatorColor.cgColor
+    separator.height(equalTo: 1)
+    return separator
+}
 
-    private func makeHeader() -> NSView {
+private func makeHeader() -> NSView {
 
-        titleLabel.font = .systemFont(ofSize: 14, weight: .medium)
-        titleLabel.textColor = .headerTextColor
+    titleLabel.font = .systemFont(ofSize: 14, weight: .medium)
+    titleLabel.textColor = .headerTextColor
 
+    [prevBtn, resetBtn, nextBtn].forEach { $0.size(equalTo: 22) }
         [prevBtn, resetBtn, nextBtn].forEach { $0.size(equalTo: 22) }
 prevBtn.image = Icons.Calendar.prev
 prevBtn.toolTip = "Previous Day" // Changed from prevMonth
