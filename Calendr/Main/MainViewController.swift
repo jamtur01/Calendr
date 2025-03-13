@@ -394,13 +394,11 @@ class MainViewController: NSViewController {
                 default: suffix = "th"
                 }
                 
-                // Get year
-                let yearFormatter = DateFormatter(calendar: dateProvider.calendar)
-                yearFormatter.dateFormat = "yyyy"
-                let year = yearFormatter.string(from: date)
+                // Get timezone abbreviation
+                let timezone = TimeZone.current.abbreviation() ?? TimeZone.current.identifier
                 
                 // Combine all parts
-                return "\(formatter.string(from: date)) \(day)\(suffix) \(year)"
+                return "\(formatter.string(from: date)) \(day)\(suffix) \(timezone)"
             }
             .bind(to: titleLabel.rx.text)
             .disposed(by: disposeBag)
