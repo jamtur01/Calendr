@@ -85,9 +85,17 @@ private func detectLinks(_ texts: [String?]) -> [URL] {
 
 private func detectMeeting(url: URL?, using workspace: WorkspaceServiceProviding) -> URL? {
 
+    guard let url = url else { return nil }
+    
+    // Special handling for SafeLinks URLs that contain Teams meeting links
+    if url.absoluteString.contains("safelinks") && url.absoluteString.contains("teams.microsoft.com") {
+        // This is a SafeLinks URL with Teams meeting - mark it as a meeting regardless of app support
+        return url
+    }
+    
+    let link = url.absoluteString
     guard
-        let link = url?.absoluteString,
-        let old_scheme = url?.scheme.map({ "\($0)://" }),
+        let old_scheme = url.scheme.map({ "\($0)://" }),
         let app = WorkspaceApp(for: link)
     else { return nil }
 
@@ -105,6 +113,10 @@ private func detectMeeting(url: URL?, using workspace: WorkspaceServiceProviding
     case .teams(let app_scheme) where workspace.supports(scheme: app_scheme):
 
         return URL(string: link.replacingOccurrences(of: old_scheme, with: app_scheme))
+        
+    // Always mark Teams meeting links as meetings even if the app isn't installed
+    case .teams:
+        return url
 
     default:
         return url
@@ -118,8 +130,11 @@ private enum WorkspaceApp {
     case other
 
     init?(for link: String) {
-
-        if link.contains("zoom.us/j") {
+        // Handle SafeLinks URLs that contain Teams meeting links
+        if link.contains("safelinks") && link.contains("teams.microsoft.com") {
+            self = .teams("msteams://")
+        }
+        else if link.contains("zoom.us/j") {
             self = .zoom("zoommtg://")
         }
         else if link.contains("teams.microsoft.com/l/meetup-join") {
