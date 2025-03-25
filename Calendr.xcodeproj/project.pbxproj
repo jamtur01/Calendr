@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -970,7 +970,6 @@
 				};
 			};
 			buildConfigurationList = 347D0F8F25952F89002451EC /* Build configuration list for PBXProject "Calendr" */;
-			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -1001,6 +1000,7 @@
 				3477E70A2C67A6A9008D3844 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				34E8556B2C711D1A00757B58 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 			);
+			preferredProjectObjectVersion = 77;
 			productRefGroup = 347D0F9525952F89002451EC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1550,6 +1550,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.16.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.kartar.calendr;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1580,6 +1581,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.16.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.kartar.calendr;
 				PRODUCT_NAME = "$(TARGET_NAME)";

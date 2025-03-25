@@ -941,7 +941,21 @@ class MainViewController: NSViewController {
                 return
             }
 
+            // First try to find an event that contains the current time (where progress bar would be visible)
             let index = items.firstIndex {
+                guard
+                    case .event(let event) = $0,
+                    !event.isAllDay,
+                    dateProvider.calendar.isDateInToday(event.start),
+                    let isInProgress = event.isInProgress.lastValue()
+                else {
+                    return false
+                }
+                
+                return isInProgress
+            }
+            // Fallback to first unfinished event if no event contains current time
+            ?? items.firstIndex {
                 guard
                     case .event(let event) = $0,
                     !event.isAllDay,
@@ -951,7 +965,8 @@ class MainViewController: NSViewController {
                     return false
                 }
                 return !isFinished
-            } ?? items.count - 1
+            }
+            ?? items.count - 1
 
             guard let rect = eventListView.childRect(at: index) else { return }
 
