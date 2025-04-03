@@ -193,6 +193,6 @@ class CalendarView: NSView {
 
 private enum Constants {
 
-    static let cornerRadius: CGFloat = 5
-    static let weekendBackgroundColor = NSColor.gray.cgColor.copy(alpha: 0.2)
+    static let cornerRadius: CGFloat = 8
+    static let weekendBackgroundColor = NSColor.gray.cgColor.copy(alpha: 0.1)
 }

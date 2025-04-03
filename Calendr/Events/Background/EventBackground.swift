@@ -27,7 +27,7 @@ extension EventBackground {
 private let pendingBackground: CGColor = {
 
     let stripes = CIFilter.stripesGenerator()
-    stripes.color0 = CIColor(color: NSColor.gray.withAlphaComponent(0.25))!
+    stripes.color0 = CIColor(color: NSColor.gray.withAlphaComponent(0.15))!
     stripes.color1 = .clear
     stripes.width = 2.5
     stripes.sharpness = 0

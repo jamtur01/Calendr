@@ -32,7 +32,7 @@ class NextEventView: NSView {
         .map { $0 ? max($1 - 10, 0) : 0 }
         .distinctUntilChanged()
 
-        let font = NSFont.systemFont(ofSize: 10)
+        let font = NSFont.menuBarFont(ofSize: 0)
         nextEventTitle = Label(font: font, scaling: viewModel.textScaling)
         nextEventTime = Label(font: font, scaling: viewModel.textScaling)
 
@@ -45,21 +45,21 @@ class NextEventView: NSView {
 
     private func configureLayout() {
 
-        nextEventView.spacing = 4
+        nextEventView.spacing = 6
         nextEventView.height(equalTo: Constants.height)
         nextEventView.wantsLayer = true
-        nextEventView.layer?.cornerRadius = 4
+        nextEventView.layer?.cornerRadius = 8
         nextEventTitle.forceVibrancy = false
 
         [.dummy, colorBar, nextEventTitle, nextEventTime, .dummy].forEach(nextEventView.addArrangedSubview)
 
         colorBar.wantsLayer = true
-        colorBar.layer?.cornerRadius = 1.5
+        colorBar.layer?.cornerRadius = 2
         colorBar.width(equalTo: 3)
-        colorBar.height(equalTo: nextEventView, constant: -4)
+        colorBar.height(equalTo: nextEventView, constant: -6)
 
         nextEventTitle.center(in: nextEventView, orientation: .vertical)
-        nextEventTitle.textColor = .headerTextColor
+        nextEventTitle.textColor = .labelColor
         nextEventTitle.lineBreakMode = .byTruncatingTail
 
         nextEventTime.center(in: nextEventTitle, orientation: .vertical)

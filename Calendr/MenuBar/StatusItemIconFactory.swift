@@ -12,7 +12,6 @@ enum StatusItemIconFactory {
     static func icon(size: CGFloat, style: StatusItemIconStyle, textScaling: Double, dateProvider: DateProviding) -> NSImage {
         let headerHeight: CGFloat = 3 * textScaling
         let borderWidth: CGFloat = 2
-        let radius: CGFloat = 2.5
         let rect = CGRect(x: 0, y: 0, width: size + borderWidth, height: size)
         let insetX = 2.5 * textScaling
 
@@ -28,22 +27,18 @@ enum StatusItemIconFactory {
             let color = NSColor.red
             color.setStroke()
             color.setFill()
+switch style {
 
-            if style != .dayOfWeek {
-                drawFrame(rect: rect, radius: radius, borderWidth: borderWidth, headerHeight: headerHeight)
-            }
+case .calendar:
+    drawCalendarDots(rect: rect, borderWidth: borderWidth, headerHeight: headerHeight)
 
-            switch style {
+case .date:
+    drawDate(rect: rect, headerHeight: headerHeight, textScaling: textScaling, dateProvider: dateProvider)
 
-            case .calendar:
-                drawCalendarDots(rect: rect, borderWidth: borderWidth, headerHeight: headerHeight)
+case .dayOfWeek:
+    drawDayOfWeekAndDate(rect: rect, insetX: insetX, textScaling: textScaling, dateProvider: dateProvider)
+}
 
-            case .date:
-                drawDate(rect: rect, headerHeight: headerHeight, textScaling: textScaling, dateProvider: dateProvider)
-
-            case .dayOfWeek:
-                drawDayOfWeekAndDate(rect: rect, insetX: insetX, textScaling: textScaling, dateProvider: dateProvider)
-            }
 
             return true
         }
@@ -53,8 +48,8 @@ enum StatusItemIconFactory {
         return image
     }
 
-    static func drawFrame(rect: CGRect, radius: CGFloat, borderWidth: CGFloat, headerHeight: CGFloat) {
-        let strokePath = NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius)
+    static func drawFrame(rect: CGRect, borderWidth: CGFloat, headerHeight: CGFloat) {
+        let strokePath = NSBezierPath(rect: rect)
         strokePath.addClip()
         strokePath.lineWidth = borderWidth
         strokePath.stroke()
@@ -99,7 +94,7 @@ enum StatusItemIconFactory {
         let fontSize = 0.6 * rect.height
         NSAttributedString(string: date, attributes: [
             .font: NSFont.systemFont(ofSize: fontSize, weight: .medium),
-            .foregroundColor: NSColor.red,
+            .foregroundColor: NSColor.labelColor,
             .paragraphStyle: paragraph
         ]).draw(in: rect.offsetBy(dx: 0, dy: rect.height / 2 - fontSize / 2))
     }
@@ -121,7 +116,7 @@ enum StatusItemIconFactory {
             let date = formatter.string(from: dateProvider.now).uppercased().trimmingCharacters(in: ["."])
             NSAttributedString(string: date, attributes: [
                 .font: NSFont.systemFont(ofSize: fontSize, weight: .bold),
-                .foregroundColor: NSColor.red,
+                .foregroundColor: NSColor.labelColor,
                 .paragraphStyle: paragraph
             ])
             .draw(in: rect.offsetBy(dx: insetX, dy: middleY - middleYSpread).insetBy(dx: -insetX, dy: 0))
@@ -132,7 +127,7 @@ enum StatusItemIconFactory {
             let date = formatter.string(from: dateProvider.now)
             NSAttributedString(string: date, attributes: [
                 .font: NSFont.systemFont(ofSize: fontSize, weight: .bold),
-                .foregroundColor: NSColor.red,
+                .foregroundColor: NSColor.labelColor,
                 .paragraphStyle: paragraph
             ])
             .draw(in: rect.offsetBy(dx: insetX, dy: middleY + middleYSpread).insetBy(dx: 0, dy: -1))
